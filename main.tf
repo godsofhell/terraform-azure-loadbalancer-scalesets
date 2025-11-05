@@ -19,19 +19,14 @@ module "network" {
     //to ensure that resourcegroup is created before vnet
     depends_on = [ module.resourcegroup ]
 }
-module "virtualmachines" {
-    source = "./modules/Compute/VirtualMachines"
+module "scalesets"{
+    source = "./modules/Compute/scalesets"
     resource_group_name = var.resource_group_name
     location            = var.location
-    vm_count = var.vm_count
-    //pass the network interface IDs from network module to VM module
-    virtual_network_interface_ids = module.network.virtual_network_interface_ids
-    virtual_machine_public_ip_addresses = module.network.public_ip_addresses
-    //to ensure that network interfaces are created before VMs
-    depends_on = [ module.network ]
+    subnet_id = module.network.subnet_id
+    lb_backhand_pool_address_id = module.loadbalancer.lb_backhand_pool_address_id
 }
-
-module "load-balancer" {
+module "loadbalancer" {
     source = "./modules/networking/loadbalancer"
     resource_group_name = var.resource_group_name
     location            = var.location
